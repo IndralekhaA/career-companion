@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Jobs</title>
+
+</head>
+<body>
+    
+    <table border="1">
+
+        <tr>
+            <th>Company</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Date Applied</th>
+            <th>Notes</th>
+
+        </tr>
+
+        {% for job in jobs %}
+        <tr>
+            <td>{{ job.company}}</td>
+            <td>{{ job.role}}</td>
+            <td>{{ job.status}}</td>
+            <td>{{ job.date_applied.strftime('%Y-%m-%d') }}</td>
+            <td>{{ job.notes}}</td>
+
+        </tr>
+        {% endfor %}
+
+    </table>
+</body>
+</html>

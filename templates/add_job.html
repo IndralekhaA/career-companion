@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Job</title>
+</head>
+<body>
+    <h1>Add New Job</h1>
+
+    <form method = "POST">
+        
+        <label>Company:</label>
+        <input type="text" name="company" required>
+        <br><br>
+
+        <label>Role:</label>
+        <input type="text" name="role" required>
+        <br><br>
+
+        <labe>Status:</labe>
+        <select name="status">
+
+            <option>Applied</option>
+            <option>Interview</option>
+            <option>Offer</option>
+            <option>Rejected</option>
+
+        </select>
+        <br><br>
+
+        <label>Date Applied:</label>
+        <input type="date" name="date_applied" required>
+        <br><br>
+
+        <label>Notes:</label>
+        <textarea name="notes"></textarea>
+        <br><br>
+
+        <button type="submit">Save Job</button>
+
+
+    </form>
+    
+</body>
+</html>
