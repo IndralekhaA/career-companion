@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Jobs</title>
+
+</head>
+<body>
+    
+    <table border="1">
+
+        <tr>
+            <th>Company</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Date Applied</th>
+            <th>Notes</th>
+
+        </tr>
+
+        {% for job in jobs %}
+        <tr>
+            <td>{{ job.company}}</td>
+            <td>{{ job.role}}</td>
+            <td>{{ job.status}}</td>
+            <td>{{ job.date_applied.strftime('%Y-%m-%d') }}</td>
+            <td>{{ job.notes}}</td>
+
+            <td>
+                <form method="POST" action="/update-job/{{job.id}}">
+                    <select name="status">
+                        <option value="Applied">Applied</option>
+                        <option value="Interview">Interview</option>
+                        <option value="Offer">Offer</option>
+                        <option value="Rejected">Rejected</option>
+
+                    </select>
+
+                    <button type="submit">
+                        Update
+                    </button>
+                </form>
+            </td>
+
+            <td>
+                <form method="POST" action="/delete-job/{{ job.id }}">
+
+                    <button type="submit" onclick="return confirm('Are you sure?')">
+                        Delete
+                    </button>
+                </form>
+            </td>
+
+        </tr>
+        {% endfor %}
+
+    </table>
+</body>
+</html>

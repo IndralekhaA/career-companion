@@ -34,8 +34,7 @@ def add_job():
             date_applied = date_applied,
             notes = notes
         )
-        print(date_applied)
-        print(type(date_applied))
+
 
         db.session.add(new_job)
         db.session.commit()
@@ -43,12 +42,31 @@ def add_job():
         return redirect(url_for("home"))
     return render_template("add_job.html")
 
-@app.route("/jobs")
+@app.route("/view-jobs")
 def view_jobs():
 
     jobs = Job.query.all()
 
-    return render_template("jobs.html", jobs = jobs)
+    return render_template("view_jobs.html", jobs = jobs)
+
+@app.route("/update-job/<int:job_id>", methods = ["POST"])
+def update_job(job_id):
+    job = Job.query.get(job_id)
+    new_status = request.form["status"]
+    job.status = new_status
+    db.session.commit()
+
+    return redirect(url_for("view_jobs"))
+
+@app.route("/delete-job/<int:job_id>", methods = ["POST"])
+def delete_job(job_id):
+
+    job = Job.query.get_or_404(job_id)
+
+    db.session.delete(job)
+    db.session.commit()
+
+    return redirect(url_for("view_jobs"))
 
 if __name__ == "__main__":
     app.run(debug=True)
