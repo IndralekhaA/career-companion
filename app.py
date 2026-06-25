@@ -1,16 +1,94 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash
 from extensions import db
+from werkzeug.security import generate_password_hash
+from models.user import User
 from models.job import Job
 from datetime import datetime
+from utils.validation import is_valid_password
+
 
 
 app = Flask(__name__)
+app.secret_key = "flask-dev-1029"
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///career.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
 
 with app.app_context():
     db.create_all()
+
+
+
+@app.route("/signup", methods = ["Get","POST"])
+def signup():
+    """
+    Register a new user.
+
+    GET:
+        Displays signup form.
+
+    POST:
+        Validates data,
+        hashes password,
+        stores user in database.
+    """
+
+    if request.method == "POST":
+        username = request.form["username"].strip()
+        email = request.form["email"].strip().lower()
+        password = request.form["password"]
+        confirm_password = request.form["confirm_password"]
+
+        #Validation 1 - Password match validation
+        if password != confirm_password:
+            flash("Passwords do not match")
+            return redirect(url_for("signup"))
+        
+        #Validation 2 - Password Strength Validation
+        if not is_valid_password(password):
+            flash("Passwords must be atleast 8 characters and contain letters and numbers.")
+            return redirect(url_for("signup"))
+
+
+
+        #Validation 3 - Unique Username Validation
+        existing_user = User.query.filter_by(username=username).first()
+
+        if existing_user:
+            flash("Username already taken. Please choose another one.")
+            return redirect(url_for("signup"))
+        
+        #Validation 4 -- Unique Email Validation
+        existing_user = User.query.filter_by(email = email).first()
+
+        if existing_user:
+            flash("Email already registered")
+            return redirect(url_for("signup"))
+        
+        hashed_password = generate_password_hash(password)
+
+        new_user = User(
+            username = username,
+            email = email,
+            password_hash = hashed_password
+        )
+
+        try:
+            db.session.add(new_user)
+            db.session.commit()
+            flash("Account created successfully!")
+            return redirect(url_for("signup"))
+        
+        except Exception:
+            db.session.rollback()
+
+            flash("Something went wrong while creating your account.")
+            return redirect(url_for("signup"))
+        
+    return render_template("signup.html")
+                            
+
+   
 
 @app.route("/")
 def home():
