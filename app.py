@@ -1,6 +1,6 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 from extensions import db
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 from models.user import User
 from models.job import Job
 from datetime import datetime
@@ -17,7 +17,17 @@ db.init_app(app)
 with app.app_context():
     db.create_all()
 
+def login_required(func):
+    from functools import wraps
 
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        if "user_id" not in session:
+            flash("Please login first.")
+            return redirect(url_for("login"))
+        return func(*args, **kwargs)
+
+    return wrapper
 
 @app.route("/signup", methods = ["Get","POST"])
 def signup():
@@ -32,6 +42,12 @@ def signup():
         hashes password,
         stores user in database.
     """
+
+    #If user already logged in -- Skip Signup page
+    if "user_id" in session:
+        flash("Already logged in!")
+        return redirect(url_for("view_jobs"))
+
 
     if request.method == "POST":
         username = request.form["username"].strip()
@@ -77,7 +93,7 @@ def signup():
             db.session.add(new_user)
             db.session.commit()
             flash("Account created successfully!")
-            return redirect(url_for("signup"))
+            return redirect(url_for("login"))
         
         except Exception:
             db.session.rollback()
@@ -88,13 +104,55 @@ def signup():
     return render_template("signup.html")
                             
 
-   
+
+@app.route("/login", methods = ["GET", "POST"])
+def login():
+    '''
+    Authenticate existing users.
+    '''
+
+    #If user already logged in -- Skip login page
+    if "user_id" in session:
+        flash("Already logged in!")
+        return redirect(url_for("home"))
+
+    if request.method == "POST":
+        email = request.form["email"].strip().lower()
+        password = request.form["password"]
+
+        user = User.query.filter_by(email = email).first()
+
+        if not user:
+            flash("Account not found.")
+            return redirect(url_for("login"))
+        
+        if not check_password_hash(user.password_hash, password):
+            flash("Incorrect password")
+            return redirect(url_for("login"))
+        
+        session["user_id"] = user.id
+        print(session)
+
+        flash("Login Successful")
+
+        return redirect(url_for("view_jobs"))
+    
+    return render_template("login.html")
+
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    flash("Logged out successfully.")
+    return redirect(url_for("login"))
+
 
 @app.route("/")
 def home():
     return render_template("index.html")
 
 @app.route("/add-job", methods = ["GET", "POST"])
+@login_required
 def add_job():
 
     if request.method == "POST":
@@ -110,7 +168,8 @@ def add_job():
             role = role,
             status = status,
             date_applied = date_applied,
-            notes = notes
+            notes = notes,
+            user_id = session["user_id"]
         )
 
 
@@ -121,13 +180,15 @@ def add_job():
     return render_template("add_job.html")
 
 @app.route("/view-jobs")
+@login_required
 def view_jobs():
 
-    jobs = Job.query.all()
+    jobs = Job.query.filter_by(user_id = session["user_id"]).all()
 
     return render_template("view_jobs.html", jobs = jobs)
 
 @app.route("/update-job/<int:job_id>", methods = ["POST"])
+@login_required
 def update_job(job_id):
     job = Job.query.get(job_id)
     new_status = request.form["status"]
@@ -137,6 +198,7 @@ def update_job(job_id):
     return redirect(url_for("view_jobs"))
 
 @app.route("/delete-job/<int:job_id>", methods = ["POST"])
+@login_required
 def delete_job(job_id):
 
     job = Job.query.get_or_404(job_id)
