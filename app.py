@@ -208,5 +208,31 @@ def delete_job(job_id):
 
     return redirect(url_for("view_jobs"))
 
+@app.route("/dashboard")
+@login_required
+def dashboard():
+
+    user_id = session["user_id"]
+
+    jobs = Job.query.filter_by(user_id = user_id).all()
+
+    total_jobs = len(jobs)
+
+    applied = len([j for j in jobs if j.status == "Applied"])
+    interview = len([j for j in jobs if j.status == "Interview"])
+    offer = len([j for j in jobs if j.status == "Offer"])
+    rejected = len([j for j in jobs if j.status == "Rejected"])
+
+    return render_template("dashboard.html",
+                           total_jobs = total_jobs,
+                           applied = applied,
+                           interview = interview,
+                           offer = offer,
+                           rejected = rejected
+                           )
+
+
+
+
 if __name__ == "__main__":
     app.run(debug=True)
