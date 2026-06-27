@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Interview</title>
+</head>
+<body>
+    <h2>Add Interview for {{ job.company }}</h2>
+    <h4>{{ job.role }}</h4>
+
+    <form method = "POST">
+
+        <input type="date" name="interview_date" required>
+        <br><br>
+
+        <input type="time" name="interview_time" required>
+        <br><br>
+
+        <input type="text" name="interview_type" placeholder="Type(HR, Technical...)" required>
+        <br><br>
+
+        <input type="number" name="round_number" placeholder="Round Number" required>
+        <br><br>
+
+        <select name="status">
+            <option>Scheduled</option>
+            <option>Completed</option>
+            <option>Cancelled</option>
+        </select>
+        <br><br>
+
+        <select name="result">
+            <option>Pending</option>
+            <option>Passed</option>
+            <option>Failed</option>
+            <option>Rejected</option>
+            <option>No Response</option>
+
+        </select>
+        <br><br>
+
+        <textarea name="notes" placeholder="Notes"></textarea>
+        <br><br>
+
+        <button type="submit">Save Interview</button>
+
+
+    </form>
+    
+
+
+
+</body>
+</html>

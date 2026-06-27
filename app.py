@@ -3,8 +3,10 @@ from extensions import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from models.user import User
 from models.job import Job
+from models.interview import Interview
 from datetime import datetime
 from utils.validation import is_valid_password
+from sqlalchemy import desc
 
 
 
@@ -207,6 +209,94 @@ def delete_job(job_id):
     db.session.commit()
 
     return redirect(url_for("view_jobs"))
+
+
+@app.route("/job/<int:job_id>/add-interview", methods = ["GET", "POST"])
+@login_required
+def add_interview(job_id):
+    job = Job.query.filter_by(id = job_id, user_id = session["user_id"]).first()
+
+    if not job:
+        return "Unauthorized or Job not found", 403
+    
+    if request.method == "GET":
+        return render_template("add_interview.html", job = job)
+    
+    if request.method == "POST":
+
+        interview = Interview(
+            job_id = job.id,
+            interview_date = datetime.strptime(request.form["interview_date"], "%Y-%m-%d").date(),
+            interview_time = datetime.strptime(request.form["interview_time"], "%H:%M").time(),
+            interview_type = request.form["interview_type"],
+            round_number = request.form["round_number"],
+            status = request.form["status"],
+            result = request.form["result"],
+            notes = request.form.get("notes")
+        )
+
+        db.session.add(interview)
+
+        db.session.commit()
+
+        return redirect(url_for("home"))
+
+@app.route("/edit-interview/<int:id>", methods = ["GET", "POST"])
+@login_required
+def edit_interview(id):
+
+    interview = Interview.query.get_or_404(id)
+
+    if request.method == "POST":
+        # Date
+        date_str = request.form.get("interview_date")
+        if date_str:
+            interview.interview_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+
+        # Time
+        time_str = request.form.get("interview_time")
+        if time_str:
+            try:
+                interview.interview_time = datetime.strptime(time_str, "%H:%M").time()
+            except ValueError:
+                interview.interview_time = datetime.strptime(time_str, "%H:%M:%S").time()
+
+        intr_type= request.form.get("interview_type")
+        if intr_type:
+             interview.interview_type = intr_type
+        round_num = request.form.get("round_number")
+        if round_num:
+            interview.round_number = int(round_num)
+        int_status = request.form.get("status")
+        if int_status:
+            interview.status = int_status
+
+        inter_result=request.form.get("result")
+        if inter_result:
+            interview.result = inter_result
+
+        interview.notes = request.form.get("notes")
+
+        db.session.commit()
+
+        return redirect(url_for("view_jobs"))
+    return render_template("edit_interview.html", interview= interview)
+
+@app.route("/delete-interview/<int:id>", methods = ["POST"])
+@login_required
+def delete_interview(id):
+    interview = Interview.query.get(id)
+
+    try:
+        db.session.delete(interview)
+        db.session.commit()
+    except:
+        flash("Unexpected Error!")
+    
+    return redirect(url_for("view_jobs"))
+
+
+
 
 @app.route("/dashboard")
 @login_required
