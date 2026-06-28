@@ -7,6 +7,7 @@ from models.interview import Interview
 from datetime import datetime
 from utils.validation import is_valid_password
 from sqlalchemy import desc
+from flask_migrate import Migrate
 
 
 
@@ -16,8 +17,11 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///career.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
 
-with app.app_context():
-    db.create_all()
+
+#with app.app_context():
+#    db.create_all()
+
+migrate = Migrate(app, db)
 
 def login_required(func):
     from functools import wraps

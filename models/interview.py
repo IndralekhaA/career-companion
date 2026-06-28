@@ -18,6 +18,7 @@ class Interview(db.Model):
     Business Rules:
         -Every interview belongs to exactly one job.
         -A job may have multiple interviews. 
+        -Exactly one interview may be marked as the final round.
     """
 
     __tablename__ = "interview"
@@ -37,6 +38,9 @@ class Interview(db.Model):
     status = db.Column(db.String(20), nullable = False)
 
     result = db.Column(db.String(20), nullable = False)
+
+    #True only for the final interview round.
+    is_final_round = db.Column(db.Boolean, default = False, nullable = False)
 
     notes = db.Column(db.Text)
 
