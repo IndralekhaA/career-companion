@@ -8,6 +8,8 @@ from datetime import datetime
 from utils.validation import is_valid_password
 from sqlalchemy import desc
 from flask_migrate import Migrate
+from utils.job_status import sync_job_status
+
 
 
 
@@ -219,7 +221,7 @@ def delete_job(job_id):
 @login_required
 def add_interview(job_id):
     job = Job.query.filter_by(id = job_id, user_id = session["user_id"]).first()
-
+    is_final = request.form.get("is_final_round") == "on"
     if not job:
         return "Unauthorized or Job not found", 403
     
@@ -236,11 +238,16 @@ def add_interview(job_id):
             round_number = request.form["round_number"],
             status = request.form["status"],
             result = request.form["result"],
+            is_final_round=is_final,
             notes = request.form.get("notes")
+
         )
 
         db.session.add(interview)
 
+        db.session.commit()
+
+        sync_job_status(job)
         db.session.commit()
 
         return redirect(url_for("home"))
@@ -250,6 +257,7 @@ def add_interview(job_id):
 def edit_interview(id):
 
     interview = Interview.query.get_or_404(id)
+    is_final = request.form.get("is_final_round") == "on"
 
     if request.method == "POST":
         # Date
@@ -279,8 +287,14 @@ def edit_interview(id):
         if inter_result:
             interview.result = inter_result
 
+        interview.is_final_round = is_final
+
         interview.notes = request.form.get("notes")
 
+
+        db.session.commit()
+
+        sync_job_status(interview.job)
         db.session.commit()
 
         return redirect(url_for("view_jobs"))
@@ -293,6 +307,9 @@ def delete_interview(id):
 
     try:
         db.session.delete(interview)
+        db.session.commit()
+
+        sync_job_status(interview.job)
         db.session.commit()
     except:
         flash("Unexpected Error!")

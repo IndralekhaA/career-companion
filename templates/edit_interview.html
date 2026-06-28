@@ -25,11 +25,29 @@
 
         <input type="number" name="round_number" value="{{interview.round_number }}" required>
         <br><br>
-
-        <input type="text" name="status" value="{{ interview.status }}"required>
+        <label>
+            <input type="checkbox" name="is_final_round"
+                {% if interview.is_final_round %}
+                    checked
+                {% endif %}
+            >
+            Final Interview Round
+        </label>
         <br><br>
 
-        <input type="text" name="result" value="{{ interview.result }}" required>
+        <select name="status" value="{{ interview.status}}" required>
+            <option>Scheduled</option>
+            <option>Completed</option>
+            <option>Cancelled</option>
+        </select>
+        <br><br>
+
+        <select name="result" value="{{ interview.result}}" required>
+            <option>Passed</option>
+            <option>Rejected</option>
+            <option>Awaiting Response</option>
+
+        </select>
         <br><br>
 
         <textarea name="notes">{{ interview.notes }} </textarea>

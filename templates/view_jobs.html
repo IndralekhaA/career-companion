@@ -32,7 +32,7 @@
             </td>
 
             <td>
-                <form method="POST" action="/update-job/{{job.id}}">
+                <form method="POST" action="/update-job/{{job.id}}" placeholder="{{ job.status }}">
                     <select name="status">
                         <option value="Applied">Applied</option>
                         <option value="Interview">Interview</option>
