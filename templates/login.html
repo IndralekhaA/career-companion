@@ -1,52 +1,179 @@
-<!DOCTYPE html>
-<html>
+{% extends "base.html" %}
 
-<head>
-    <title>Login</title>
-</head>
+{% block title %}Login{% endblock %}
 
-<body>
+{% block content %}
 
-    <h1>Login</h1>
+<div class="auth-container fade-up">
 
-    {% with messages = get_flashed_messages() %}
+    <div class="card auth-card">
 
-        {% if messages %}
+        <div class="card-body">
 
-            {% for message in messages %}
-                <p>{{ message }}</p>
-            {% endfor %}
+            <div class="text-center mb-4">
 
-        {% endif %}
+                <i class="bi bi-person-circle display-3 text-primary"></i>
 
-    {% endwith %}
+                <h2 class="auth-title mt-3">
 
-    <form method="POST">
+                    Welcome Back
 
-        <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            required
-        >
+                </h2>
 
-        <br><br>
+                <p class="auth-subtitle">
 
-        <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            required
-        >
+                    Sign in to continue managing your job applications.
 
-        <br><br>
+                </p>
 
-        <button type="submit">
-            Login
-        </button>
+            </div>
 
-    </form>
+            <form method="POST">
 
-</body>
+                <div class="mb-3">
 
-</html>
+                    <label class="form-label">
+
+                        Email Address
+
+                    </label>
+
+                    <div class="input-group">
+
+                        <span class="input-group-text">
+
+                            <i class="bi bi-envelope"></i>
+
+                        </span>
+
+                        <input
+                            type="email"
+                            name="email"
+                            class="form-control"
+                            placeholder="Enter your email"
+                            required>
+
+                    </div>
+
+                </div>
+
+                <div class="mb-4">
+
+                    <label class="form-label">
+
+                        Password
+
+                    </label>
+
+                    <div class="input-group">
+
+                        <span class="input-group-text">
+
+                            <i class="bi bi-lock"></i>
+
+                        </span>
+
+                        <input
+                            type="password"
+                            name="password"
+                            id="password"
+                            class="form-control"
+                            placeholder="Enter your password"
+                            required>
+
+                        <button
+                            class="btn btn-outline-secondary"
+                            type="button"
+                            id="togglePassword">
+
+                            <i class="bi bi-eye"></i>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <div class="d-grid">
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary btn-lg">
+
+                        <i class="bi bi-box-arrow-in-right me-2"></i>
+
+                        Login
+
+                    </button>
+
+                </div>
+
+            </form>
+
+            <hr class="my-4">
+
+            <div class="text-center">
+
+                <p class="mb-0">
+
+                    Don't have an account?
+
+                    <a
+                        href="{{ url_for('signup') }}"
+                        class="fw-semibold">
+
+                        Create Account
+
+                    </a>
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function(){
+
+    const toggle = document.getElementById("togglePassword");
+
+    const password = document.getElementById("password");
+
+    if(toggle){
+
+        toggle.addEventListener("click", function(){
+
+            if(password.type === "password"){
+
+                password.type = "text";
+
+                this.innerHTML =
+                    '<i class="bi bi-eye-slash"></i>';
+
+            }else{
+
+                password.type = "password";
+
+                this.innerHTML =
+                    '<i class="bi bi-eye"></i>';
+
+            }
+
+        });
+
+    }
+
+});
+
+</script>
+
+{% endblock %}

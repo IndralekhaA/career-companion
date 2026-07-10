@@ -2,12 +2,6 @@ def sync_job_status(job):
 
     interviews = job.interviews.all()
 
-    print("---- SYNC START ----")
-    print("Job:", job.id)
-
-    for i in interviews:
-        print(i.status, i.result, i.is_final_round)
-
     if not interviews:
         job.status = "Applied"
         return
@@ -21,14 +15,16 @@ def sync_job_status(job):
     status = final.status.lower().strip()
     result = final.result.lower().strip()
 
+    if status != "completed":
+        job.status = "Interview"
+        return
 
+    if result == "offer":
+        job.status = "Offer"
 
-    if status == "completed":
-        if result == "passed":
-            job.status = "Offer"
-        elif result == "rejected":
-            job.status = "Rejected"
-        else:
-            job.status = "Interview"
+    elif result == "failed":
+        job.status = "Rejected"
+
     else:
+        # passed or no response
         job.status = "Interview"

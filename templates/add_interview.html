@@ -1,56 +1,310 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Interview</title>
-</head>
-<body>
-    <h2>Add Interview for {{ job.company }}</h2>
-    <h4>{{ job.role }}</h4>
+{% extends "base.html" %}
 
-    <form method = "POST">
+{% block title %}Add Interview{% endblock %}
 
-        <input type="date" name="interview_date" required>
-        <br><br>
+{% block content %}
 
-        <input type="time" name="interview_time" required>
-        <br><br>
+<div class="auth-container fade-up">
 
-        <input type="text" name="interview_type" placeholder="Type(HR, Technical...)" required>
-        <br><br>
+    <div class="card auth-card">
 
-        <input type="number" name="round_number" placeholder="Round Number" required>
-        <br><br>
-        <input type="checkbox" name="is_final_round">
-        <label>This is the final interview round</label>
-        <br><br>
+        <div class="card-body">
 
-        <select name="status">
-            <option>Scheduled</option>
-            <option>Completed</option>
-            <option>Cancelled</option>
-        </select>
-        <br><br>
+            <div class="text-center mb-4">
 
-        <select name="result">
-            <option>Passed</option>
-            <option>Rejected</option>
-            <option>Awaiting Response</option>
+                <i class="bi bi-calendar-event display-3 text-primary"></i>
 
-        </select>
-        <br><br>
+                <h2 class="auth-title mt-3">
 
-        <textarea name="notes" placeholder="Notes"></textarea>
-        <br><br>
+                    Add Interview
 
-        <button type="submit">Save Interview</button>
+                </h2>
 
+                <p class="auth-subtitle">
 
-    </form>
-    
+                    {{ job.company }} • {{ job.role }}
 
+                </p>
 
+            </div>
 
-</body>
-</html>
+            <form method="POST">
+
+                <!-- Interview Date -->
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+
+                        Interview Date
+
+                    </label>
+
+                    <input
+                        type="date"
+                        class="form-control"
+                        name="interview_date"
+                        required>
+
+                </div>
+
+                <!-- Interview Time -->
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+
+                        Interview Time
+
+                    </label>
+
+                    <input
+                        type="time"
+                        class="form-control"
+                        name="interview_time"
+                        required>
+
+                </div>
+
+                <!-- Interview Type -->
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+
+                        Interview Type
+
+                    </label>
+
+                    <select
+                        class="form-select"
+                        name="interview_type"
+                        required>
+
+                        <option value="">Select Interview Type</option>
+
+                        <option value="Recruiter Screen">
+
+                            Recruiter Screen
+
+                        </option>
+
+                        <option value="HR">
+
+                            HR
+
+                        </option>
+
+                        <option value="Technical">
+
+                            Technical
+
+                        </option>
+
+                        <option value="Manager">
+
+                            Hiring Manager
+
+                        </option>
+
+                        <option value="System Design">
+
+                            System Design
+
+                        </option>
+
+                        <option value="Behavioral">
+
+                            Behavioral
+
+                        </option>
+
+                        <option value="Panel">
+
+                            Panel
+
+                        </option>
+
+                        <option value="Final">
+
+                            Final
+
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <!-- Round -->
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+
+                        Round Number
+
+                    </label>
+
+                    <input
+                        type="number"
+                        class="form-control"
+                        name="round_number"
+                        min="1"
+                        value="1"
+                        required>
+
+                </div>
+
+                <!-- Status -->
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+
+                        Interview Status
+
+                    </label>
+
+                    <select
+                        class="form-select"
+                        name="status"
+                        required>
+
+                        <option value="Scheduled">
+
+                            Scheduled
+
+                        </option>
+
+                        <option value="Completed">
+
+                            Completed
+
+                        </option>
+
+                        <option value="Cancelled">
+
+                            Cancelled
+
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <!-- Result -->
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+
+                        Result
+
+                    </label>
+
+                    <select
+                        class="form-select"
+                        name="result"
+                        required>
+
+                        <option value="No response">
+
+                            Awaiting Feedback
+
+                        </option>
+
+                        <option value="Passed">
+
+                            Passed
+
+                        </option>
+
+                        <option value="Failed">
+
+                            Failed
+
+                        </option>
+
+                        <option value="Offer">
+
+                            Offer
+
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <!-- Final Round -->
+
+                <div class="form-check mb-4">
+
+                    <input
+                        class="form-check-input"
+                        type="checkbox"
+                        name="is_final_round"
+                        id="finalRound">
+
+                    <label
+                        class="form-check-label"
+                        for="finalRound">
+
+                        This is the Final Interview Round
+
+                    </label>
+
+                </div>
+
+                <!-- Notes -->
+
+                <div class="mb-4">
+
+                    <label class="form-label">
+
+                        Notes
+
+                    </label>
+
+                    <textarea
+                        class="form-control"
+                        rows="5"
+                        name="notes"
+                        placeholder="Interviewers, preparation topics, feedback, questions asked, etc."></textarea>
+
+                </div>
+
+                <!-- Buttons -->
+
+                <div class="d-flex justify-content-between">
+
+                    <a
+                        href="{{ url_for('view_jobs') }}"
+                        class="btn btn-outline-secondary">
+
+                        <i class="bi bi-arrow-left"></i>
+
+                        Back
+
+                    </a>
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary">
+
+                        <i class="bi bi-calendar-plus"></i>
+
+                        Save Interview
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

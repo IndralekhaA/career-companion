@@ -1,64 +1,327 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Interview</title>
+{% extends "base.html" %}
 
-</head>
-<body>
-    <h2>Edit Interview </h2>
+{% block title %}Edit Interview{% endblock %}
 
-    <form method="POST">
-        <input type="date" name="interview_date" value="{{ interview.interview_date }}" required>
-        <br><br>
-        <!--
-        HTML <input type="time"> expects HH:MM.
-        Python time objects render as HH:MM:SS by default,
-        so we format using strftime to avoid parsing errors.
-        -->
-        <input type="time" name="interview_time" value="{{ interview.interview_time.strftime('%H:%M') }}" required>
-        <br><br>
+{% block content %}
 
-        <input type="text" name="interview_type" value="{{ interview.interview_type }}" required>
-        <br><br>
+<div class="auth-container fade-up">
 
-        <input type="number" name="round_number" value="{{interview.round_number }}" required>
-        <br><br>
-        <label>
-            <input type="checkbox" name="is_final_round"
-                {% if interview.is_final_round %}
-                    checked
-                {% endif %}
-            >
-            Final Interview Round
-        </label>
-        <br><br>
+    <div class="card auth-card">
 
-        <select name="status" value="{{ interview.status}}" required>
-            <option>Scheduled</option>
-            <option>Completed</option>
-            <option>Cancelled</option>
-        </select>
-        <br><br>
+        <div class="card-body">
 
-        <select name="result" value="{{ interview.result}}" required>
-            <option>Passed</option>
-            <option>Rejected</option>
-            <option>Awaiting Response</option>
+            <div class="text-center mb-4">
 
-        </select>
-        <br><br>
+                <i class="bi bi-pencil-square display-3 text-primary"></i>
 
-        <textarea name="notes">{{ interview.notes }} </textarea>
-        <br><br>
+                <h2 class="auth-title mt-3">
 
-        <button type="submit">Update Interview </button>
+                    Edit Interview
 
+                </h2>
 
+                <p class="auth-subtitle">
 
-    </form>
+                    {{ interview.job.company }} • {{ interview.job.role }}
 
+                </p>
 
-</body>
-</html>
+            </div>
+
+            <form method="POST">
+
+                <!-- Interview Date -->
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+
+                        Interview Date
+
+                    </label>
+
+                    <input
+                        type="date"
+                        class="form-control"
+                        name="interview_date"
+                        value="{{ interview.interview_date.strftime('%Y-%m-%d') }}"
+                        required>
+
+                </div>
+
+                <!-- Interview Time -->
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+
+                        Interview Time
+
+                    </label>
+
+                    <input
+                        type="time"
+                        class="form-control"
+                        name="interview_time"
+                        value="{{ interview.interview_time.strftime('%H:%M') }}"
+                        required>
+
+                </div>
+
+                <!-- Interview Type -->
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+
+                        Interview Type
+
+                    </label>
+
+                    <select
+                        class="form-select"
+                        name="interview_type"
+                        required>
+
+                        {% set types = [
+                            "Recruiter Screen",
+                            "HR",
+                            "Technical",
+                            "Manager",
+                            "System Design",
+                            "Behavioral",
+                            "Panel",
+                            "Final"
+                        ] %}
+
+                        {% for t in types %}
+
+                        <option
+                            value="{{ t }}"
+                            {% if interview.interview_type == t %}selected{% endif %}>
+
+                            {{ t }}
+
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+                <!-- Round -->
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+
+                        Round Number
+
+                    </label>
+
+                    <input
+                        type="number"
+                        class="form-control"
+                        name="round_number"
+                        value="{{ interview.round_number }}"
+                        min="1"
+                        required>
+
+                </div>
+
+                <!-- Status -->
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+
+                        Interview Status
+
+                    </label>
+
+                    <select
+                        class="form-select"
+                        id="status"
+                        name="status">
+
+                        <option value="Scheduled"
+                            {% if interview.status=="Scheduled" %}selected{% endif %}>
+
+                            Scheduled
+
+                        </option>
+
+                        <option value="Completed"
+                            {% if interview.status=="Completed" %}selected{% endif %}>
+
+                            Completed
+
+                        </option>
+
+                        <option value="Cancelled"
+                            {% if interview.status=="Cancelled" %}selected{% endif %}>
+
+                            Cancelled
+
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <!-- Result -->
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+
+                        Result
+
+                    </label>
+
+                    <select
+                        class="form-select"
+                        id="result"
+                        name="result">
+
+                        <option value="No response"
+                            {% if interview.result=="No response" %}selected{% endif %}>
+
+                            Awaiting Feedback
+
+                        </option>
+
+                        <option value="Passed"
+                            {% if interview.result=="Passed" %}selected{% endif %}>
+
+                            Passed
+
+                        </option>
+
+                        <option value="Failed"
+                            {% if interview.result=="Failed" %}selected{% endif %}>
+
+                            Failed
+
+                        </option>
+
+                        <option value="Offer"
+                            {% if interview.result=="Offer" %}selected{% endif %}>
+
+                            Offer
+
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <!-- Final Round -->
+
+                <div class="form-check mb-4">
+
+                    <input
+                        class="form-check-input"
+                        type="checkbox"
+                        id="finalRound"
+                        name="is_final_round"
+                        {% if interview.is_final_round %}checked{% endif %}>
+
+                    <label
+                        class="form-check-label"
+                        for="finalRound">
+
+                        Final Interview Round
+
+                    </label>
+
+                </div>
+
+                <!-- Notes -->
+
+                <div class="mb-4">
+
+                    <label class="form-label">
+
+                        Notes
+
+                    </label>
+
+                    <textarea
+                        class="form-control"
+                        rows="5"
+                        name="notes">{{ interview.notes }}</textarea>
+
+                </div>
+
+                <div class="d-flex justify-content-between">
+
+                    <a
+                        href="{{ url_for('view_jobs') }}"
+                        class="btn btn-outline-secondary">
+
+                        <i class="bi bi-arrow-left"></i>
+
+                        Back
+
+                    </a>
+
+                    <button
+                        class="btn btn-primary"
+                        type="submit">
+
+                        <i class="bi bi-floppy"></i>
+
+                        Update Interview
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function(){
+
+    const status = document.getElementById("status");
+
+    const result = document.getElementById("result");
+
+    function updateResultField(){
+
+        if(status.value === "Completed"){
+
+            result.disabled = false;
+
+        }
+        else{
+
+            result.value = "No response";
+
+            result.disabled = true;
+
+        }
+
+    }
+
+    updateResultField();
+
+    status.addEventListener("change", updateResultField);
+
+});
+
+</script>
+
+{% endblock %}

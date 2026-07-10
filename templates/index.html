@@ -1,30 +1,179 @@
-<!DOCTYPE html>
-<html>
+{% extends "base.html" %}
 
-<head>
+{% block title %}Career Companion{% endblock %}
 
-    <title>Career Companion</title>
+{% block content %}
 
-</head>
+<div class="container py-5">
 
-<body>
+    <div class="row align-items-center">
 
-    <h1>Welcome to Career Companion</h1>
+        <!-- Left Side -->
 
-    <p>Your Personal Job Search Assistant</p>
+        <div class="col-lg-6">
 
-    <a href="/signup">Sign Up</a>
+            <h1 class="display-4 fw-bold mb-3">
 
-    <a href="/add-job">Add Job</a>
+                Career Companion
 
-    <a href="/view-jobs"> View Jobs</a>
+            </h1>
 
-    <a href="/login">Login</a>
+            <p class="lead text-muted">
 
-    <a href="/logout">Logout</a>
+                Organize every job application, track interviews,
+                monitor your progress, and stay focused on landing
+                your next opportunity.
 
-    <a href="/dashboard">Dashboard</a>
+            </p>
 
-</body>
+            <div class="mt-4">
 
-</html>
+                <a href="{{ url_for('signup') }}"
+                   class="btn btn-primary btn-lg me-3">
+
+                    <i class="bi bi-person-plus-fill"></i>
+
+                    Get Started
+
+                </a>
+
+                <a href="{{ url_for('login') }}"
+                   class="btn btn-outline-primary btn-lg">
+
+                    <i class="bi bi-box-arrow-in-right"></i>
+
+                    Login
+
+                </a>
+
+            </div>
+
+        </div>
+
+        <!-- Right Side -->
+
+        <div class="col-lg-6 text-center mt-5 mt-lg-0">
+
+            <i class="bi bi-briefcase-fill text-primary"
+               style="font-size:10rem;"></i>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Features -->
+
+<div class="container py-5">
+
+    <div class="row g-4">
+
+        <div class="col-md-4">
+
+            <div class="card h-100 shadow-sm">
+
+                <div class="card-body text-center">
+
+                    <i class="bi bi-briefcase fs-1 text-primary"></i>
+
+                    <h4 class="mt-3">
+
+                        Job Tracking
+
+                    </h4>
+
+                    <p>
+
+                        Organize every application in one place.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-4">
+
+            <div class="card h-100 shadow-sm">
+
+                <div class="card-body text-center">
+
+                    <i class="bi bi-calendar-event fs-1 text-success"></i>
+
+                    <h4 class="mt-3">
+
+                        Interview Timeline
+
+                    </h4>
+
+                    <p>
+
+                        Track interview rounds, results and notes.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-4">
+
+            <div class="card h-100 shadow-sm">
+
+                <div class="card-body text-center">
+
+                    <i class="bi bi-graph-up-arrow fs-1 text-warning"></i>
+
+                    <h4 class="mt-3">
+
+                        Dashboard
+
+                    </h4>
+
+                    <p>
+
+                        Visualize your job search progress at a glance.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Call to Action -->
+
+<div class="container py-5 text-center">
+
+    <h2>
+
+        Ready to organize your job search?
+
+    </h2>
+
+    <p class="text-muted">
+
+        Create your free account and start tracking applications today.
+
+    </p>
+
+    <a href="{{ url_for('signup') }}"
+       class="btn btn-success btn-lg">
+
+        Start Tracking
+
+    </a>
+
+</div>
+
+{% endblock %}

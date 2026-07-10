@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Add Job{% endblock %}
+{% block title %}Edit Job{% endblock %}
 
 {% block content %}
 
@@ -12,17 +12,17 @@
 
             <div class="text-center mb-4">
 
-                <i class="bi bi-briefcase-fill display-3 text-primary"></i>
+                <i class="bi bi-pencil-square display-3 text-primary"></i>
 
                 <h2 class="auth-title mt-3">
 
-                    Add New Job
+                    Edit Job
 
                 </h2>
 
                 <p class="auth-subtitle">
 
-                    Track a new job application.
+                    Update your job application details.
 
                 </p>
 
@@ -52,7 +52,7 @@
                             type="text"
                             class="form-control"
                             name="company"
-                            placeholder="Google"
+                            value="{{ job.company }}"
                             required>
 
                     </div>
@@ -81,7 +81,7 @@
                             type="text"
                             class="form-control"
                             name="role"
-                            placeholder="Backend Software Engineer"
+                            value="{{ job.role }}"
                             required>
 
                     </div>
@@ -98,42 +98,48 @@
 
                     </label>
 
-                    <select
+
+                    <input
+                        class="form-control"
+                        value="{{ job.status }}"
+                        readonly>
+
+                    <div class="form-text text-muted">
+
+                        Status is automatically updated from interview progress.
+
+                    </div>
+
+                  <!--- <select
                         class="form-select"
                         name="status"
                         required>
 
-                        <option value="">Select Status</option>
-
-                        <option value="Applied">
-
+                        <option value="Applied"
+                            {% if job.status == "Applied" %}selected{% endif %}>
                             Applied
-
                         </option>
 
-                        <option value="Interview">
-
+                        <option value="Interview"
+                            {% if job.status == "Interview" %}selected{% endif %}>
                             Interview
-
                         </option>
 
-                        <option value="Offer">
-
+                        <option value="Offer"
+                            {% if job.status == "Offer" %}selected{% endif %}>
                             Offer
-
                         </option>
 
-                        <option value="Rejected">
-
+                        <option value="Rejected"
+                            {% if job.status == "Rejected" %}selected{% endif %}>
                             Rejected
-
                         </option>
 
                     </select>
 
-                </div>
+                </div> -->
 
-                <!-- Date -->
+                <!-- Date Applied -->
 
                 <div class="mb-3">
 
@@ -147,6 +153,7 @@
                         type="date"
                         class="form-control"
                         name="date_applied"
+                        value="{{ job.date_applied.strftime('%Y-%m-%d') if job.date_applied else '' }}"
                         required>
 
                 </div>
@@ -165,7 +172,7 @@
                         class="form-control"
                         rows="5"
                         name="notes"
-                        placeholder="Recruiter name, referral, salary, interview preparation, links, etc."></textarea>
+                        placeholder="Recruiter information, salary, links, interview prep, etc.">{{ job.notes or '' }}</textarea>
 
                 </div>
 
@@ -179,7 +186,7 @@
 
                         <i class="bi bi-arrow-left"></i>
 
-                        Back
+                        Cancel
 
                     </a>
 
@@ -187,9 +194,9 @@
                         type="submit"
                         class="btn btn-primary">
 
-                        <i class="bi bi-floppy"></i>
+                        <i class="bi bi-check-circle"></i>
 
-                        Save Job
+                        Update Job
 
                     </button>
 

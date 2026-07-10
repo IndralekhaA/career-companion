@@ -1,186 +1,612 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>View Jobs</title>
+{% extends "base.html" %}
 
-</head>
-<body>
-    
-    <table border="1">
+{% block title %}Jobs{% endblock %}
 
-        <tr>
-            <th>Company</th>
-            <th>Role</th>
-            <th>Status</th>
-            <th>Date Applied</th>
-            <th>Notes</th>
-            <th>Interviews</th>
+{% block content %}
 
-        </tr>
+<div class="d-flex justify-content-between align-items-center flex-wrap mb-4">
 
-        {% for job in jobs %}
-        <tr>
-            <td>{{ job.company}}</td>
-            <td>{{ job.role}}</td>
-            <td>{{ job.status}}</td>
-            <td>{{ job.date_applied.strftime('%Y-%m-%d') }}</td>
-            <td>{{ job.notes}}</td>
-            <td>
-                <button type="button" onclick="toggleInterviews('{{ job.id }}')">Interviews ({{ job.interviews.count() }})</button>
-            </td>
+    <div>
+        <h2 class="fw-bold mb-1">
+            <i class="bi bi-briefcase-fill text-primary"></i>
+            Job Tracker
+        </h2>
 
-            <td>
-                <form method="POST" action="/update-job/{{job.id}}" placeholder="{{ job.status }}">
-                    <select name="status">
-                        <option value="Applied">Applied</option>
-                        <option value="Interview">Interview</option>
-                        <option value="Offer">Offer</option>
-                        <option value="Rejected">Rejected</option>
+        <p class="text-muted mb-0">
+            Manage all your applications in one place.
+        </p>
+    </div>
 
-                    </select>
+    <div class="mt-3 mt-md-0">
 
-                    <button type="submit">
-                        Update
-                    </button>
-                </form>
-            </td>
+        <a href="{{ url_for('add_job') }}"
+           class="btn btn-primary">
 
-            <td>
-                <form method="POST" action="/delete-job/{{ job.id }}">
+            <i class="bi bi-plus-circle"></i>
 
-                    <button type="submit" onclick="return confirm('Are you sure?')">
-                        Delete
-                    </button>
-                </form>
-            </td>
+            Add Job
 
-            <td>
+        </a>
 
-                <a href="{{ url_for('add_interview', job_id=job.id) }}">Add Interview</a>
-            </td>
+    </div>
 
-        </tr>
-        
+</div>
 
-        <tr id="interviews-{{ job.id }}" style="display:none;">
-            <td colspan="9">
-                {% if job.interviews.count() > 0 %}
+<!-- Search -->
 
-                    <ul style="list-style:none; padding:0;">
+<div class="card shadow-sm border-0 mb-4">
 
-                        {% for interview in job.get_sorted_interviews() %}
+    <div class="card-body">
 
-                            <li style="margin-bottom:10px">
+        <div class="input-group">
 
-                                <div style="border:1px solid #ccc; padding:12px; margin-bottom:12px; border-radius:6px;">
+            <span class="input-group-text bg-white">
 
-                                    <strong>{{ interview.interview_type }}</strong>
-                                    (Round {{ interview.round_number }})
+                <i class="bi bi-search"></i>
 
-                                    <br><br>
+            </span>
 
-                                    📅 {{ interview.interview_date.strftime("%b %d, %Y") }}
-                                    &nbsp;&nbsp;
-                                    🕒 {{ interview.interview_time.strftime("%I:%M %p") }}
+            <input
+                type="text"
+                id="jobSearch"
+                class="form-control"
+                placeholder="Search company, role or status...">
 
-                                    <br><br>
+        </div>
 
-                                    <strong>Status:</strong>
-                                    {{ interview.status }}
+    </div>
 
-                                    {% if interview.status == "Completed" %}
+</div>
 
-                                        <br>
+{% if jobs %}
 
-                                        <strong>Result:</strong>
+{% for job in jobs %}
 
-                                        {% if interview.result == "No response" %}
-                                            Awaiting Feedback
-                                        {% else %}
-                                            {{ interview.result }}
-                                        {% endif %}
+<div class="card shadow-sm border-0 mb-4 job-card">
 
-                                    {% endif %}
+    <div class="card-body">
 
-                                    {% if interview.notes %}
+        <div class="d-flex justify-content-between align-items-start flex-wrap">
 
-                                        <br><br>
+            <div>
 
-                                        <strong>Notes:</strong>
+                <h4 class="fw-bold mb-1">
 
-                                        <br>
+                    {{ job.company }}
 
-                                        {{ interview.notes }}
+                </h4>
 
-                                    {% endif %}
+                <h6 class="text-muted">
 
-                                    <br><br>
+                    {{ job.role }}
 
-                                    <a href="{{ url_for('edit_interview', id=interview.id) }}">
-                                        Edit
-                                    </a>
+                </h6>
 
-                                    |
+            </div>
 
-                                    <form method="POST"
-                                        action="{{ url_for('delete_interview', id=interview.id) }}"
-                                        style="display:inline;">
+            <div>
 
-                                        <button
-                                            type="submit"
-                                            onclick="return confirm('Delete this interview?')">
+                {% if job.status == "Applied" %}
 
-                                            Delete
+                    <span class="badge rounded-pill bg-primary px-3 py-2">
 
-                                        </button>
+                        Applied
 
-                                    </form>
+                    </span>
 
-                                </div>
+                {% elif job.status == "Interview" %}
 
-                                    
-                                
+                    <span class="badge rounded-pill bg-warning text-dark px-3 py-2">
 
-                            </li>
+                        Interview
 
-                        {% endfor %}
+                    </span>
 
-                    </ul>
+                {% elif job.status == "Offer" %}
+
+                    <span class="badge rounded-pill bg-success px-3 py-2">
+
+                        Offer
+
+                    </span>
+
+                {% elif job.status == "Rejected" %}
+
+                    <span class="badge rounded-pill bg-danger px-3 py-2">
+
+                        Rejected
+
+                    </span>
 
                 {% else %}
 
-                    <p style="color:gray;">No interviews added yet.</p>
+                    <span class="badge bg-secondary">
+
+                        {{ job.status }}
+
+                    </span>
 
                 {% endif %}
-            </td>
 
-        </tr>
-        {% endfor %}
+            </div>
 
+        </div>
 
+        <hr>
 
-    </table>
-    
-    <script>
-        /**
-         * Show or hide interviews
-         * for a specific job.
-         */
-        function toggleInterviews(jobId){
-            let row = document.getElementById("interviews-" + jobId )
-            if(row.style.display === "none"){
-                row.style.display = "table-row";
-            }else{
-                row.style.display = "none";
-            }
-        }
+        <div class="row">
 
+            <div class="col-md-4">
 
-    </script>
+                <small class="text-muted">
 
+                    <i class="bi bi-calendar3"></i>
 
+                    Applied On
 
-</body>
-</html>
+                </small>
+
+                <div class="fw-semibold">
+
+                    {{ job.date_applied.strftime("%b %d, %Y") if job.date_applied else "-" }}
+
+                </div>
+
+            </div>
+
+            <div class="col-md-8">
+
+                <small class="text-muted">
+
+                    <i class="bi bi-journal-text"></i>
+
+                    Notes
+
+                </small>
+
+                <div>
+
+                    {% if job.notes %}
+
+                        {{ job.notes[:150] }}
+
+                        {% if job.notes|length > 150 %}
+
+                            ...
+
+                        {% endif %}
+
+                    {% else %}
+
+                        <span class="text-muted">
+
+                            No notes available.
+
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="mt-4 d-flex flex-wrap gap-2">
+
+            <!-- Edit -->
+
+            <a
+                href="{{ url_for('edit_job', job_id=job.id) }}"
+                class="dropdown-item">
+
+                <i class="bi bi-pencil"></i>
+
+                Edit Job
+
+            </a>
+
+            <!-- Delete -->
+
+            <form
+                action="{{ url_for('delete_job', job_id=job.id) }}"
+                method="POST">
+
+                <button
+                    class="btn btn-outline-danger btn-sm">
+
+                    <i class="bi bi-trash"></i>
+
+                    Delete
+
+                </button>
+
+            </form>
+
+            <!-- Add Interview -->
+
+            <a
+                href="{{ url_for('add_interview', job_id=job.id) }}"
+                class="btn btn-success btn-sm">
+
+                <i class="bi bi-plus-circle"></i>
+
+                Interview
+
+            </a>
+
+            <!-- Collapse -->
+
+            <button
+                class="btn btn-outline-secondary btn-sm"
+                data-bs-toggle="collapse"
+                data-bs-target="#history{{ job.id }}">
+
+                <i class="bi bi-chevron-down"></i>
+
+                Interview History
+
+            </button>
+
+        </div>
+
+        <!-- ========================= -->
+
+        <!-- Interview Collapse Starts -->
+
+        <!-- ========================= -->
+
+        <div
+            class="collapse mt-4"
+            id="history{{ job.id }}">
+            <!-- ================= Interview History ================= -->
+
+            {% set interviews = job.get_sorted_interviews() %}
+
+            {% if interviews %}     
+
+            <div class="border-top pt-4">
+
+                <h5 class="fw-bold mb-4">
+
+                    <i class="bi bi-clock-history text-primary"></i>
+
+                    Interview Timeline
+
+                </h5>
+
+                {% for interview in interviews %}
+
+                <div class="timeline-item mb-4">
+
+                    <div class="d-flex justify-content-between flex-wrap">
+
+                        <div>
+
+                            <h6 class="fw-bold mb-1">
+
+                                Round {{ interview.round_number }}
+
+                                {% if interview.is_final_round %}
+
+                                    <span class="badge bg-dark ms-2">
+
+                                        Final Round
+
+                                    </span>
+
+                                {% endif %}
+
+                            </h6>
+
+                            <div class="text-muted">
+
+                                {{ interview.interview_type }}
+
+                            </div>
+
+                        </div>
+
+                        <div class="text-end">
+
+                            <div>
+
+                                <i class="bi bi-calendar3"></i>
+
+                                {{ interview.interview_date.strftime("%b %d, %Y") }}
+
+                            </div>
+
+                            <div>
+
+                                <i class="bi bi-clock"></i>
+
+                                {{ interview.interview_time.strftime("%I:%M %p") }}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="mt-3">
+
+                        <!-- Status -->
+
+                        {% if interview.status == "Scheduled" %}
+
+                            <span class="badge bg-warning text-dark">
+
+                                Scheduled
+
+                            </span>
+
+                        {% elif interview.status == "Completed" %}
+
+                            <span class="badge bg-success">
+
+                                Completed
+
+                            </span>
+
+                        {% elif interview.status == "Cancelled" %}
+
+                            <span class="badge bg-danger">
+
+                                Cancelled
+
+                            </span>
+
+                        {% else %}
+
+                            <span class="badge bg-secondary">
+
+                                {{ interview.status }}
+
+                            </span>
+
+                        {% endif %}
+
+                        <!-- Result -->
+
+                        {% if interview.result == "Passed" %}
+
+                            <span class="badge bg-success">
+
+                                Passed
+
+                            </span>
+
+                        {% elif interview.result == "Failed" %}
+
+                            <span class="badge bg-danger">
+
+                                Failed
+
+                            </span>
+
+                        {% elif interview.result == "Offer" %}
+
+                            <span class="badge bg-primary">
+
+                                Offer
+
+                            </span>
+
+                        {% else %}
+
+                            <span class="badge bg-info text-dark">
+
+                                {{ interview.display_result }}
+
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+                    {% if interview.notes %}
+
+                    <div class="mt-3">
+
+                        <small class="text-muted">
+
+                            Notes
+
+                        </small>
+
+                        <p class="mb-0">
+
+                            {{ interview.notes }}
+
+                        </p>
+
+                    </div>
+
+                    {% endif %}
+
+                    <div class="mt-3 d-flex gap-2">
+
+                        <a
+                            href="{{ url_for('edit_interview', id=interview.id) }}"
+                            class="btn btn-outline-primary btn-sm">
+
+                            <i class="bi bi-pencil-square"></i>
+
+                            Edit
+
+                        </a>
+
+                        <form
+                            action="{{ url_for('delete_interview', id=interview.id) }}"
+                            method="POST">
+
+                            <button
+                                class="btn btn-outline-danger btn-sm">
+
+                                <i class="bi bi-trash"></i>
+
+                                Delete
+
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                    {% if not loop.last %}
+
+                    <hr>
+
+                    {% endif %}
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+            {% else %}
+
+            <div class="text-center py-4">
+
+                <i class="bi bi-calendar-x display-6 text-muted"></i>
+
+                <p class="text-muted mt-3">
+
+                    No interviews have been added yet.
+
+                </p>
+
+                <a
+                    href="{{ url_for('add_interview', job_id=job.id) }}"
+                    class="btn btn-primary">
+
+                    <i class="bi bi-plus-circle"></i>
+
+                    Add First Interview
+
+                </a>
+
+            </div>
+
+            {% endif %}
+
+            </div>
+
+            </div>
+
+            </div>
+
+            {% endfor %}
+            {% else %}
+
+            <div class="text-center py-5">
+
+                <div class="display-5 mb-3">
+                    💼
+                </div>
+
+                <h4>No Job Applications Yet</h4>
+
+                <p class="text-muted">
+                    Start tracking your job search by adding your first application.
+                </p>
+
+                <a href="{{ url_for('add_job') }}"
+                class="btn btn-primary">
+
+                    <i class="bi bi-plus-circle"></i>
+
+                    Add Your First Job
+
+                </a>
+
+            </div>
+
+            {% endif %}
+
+            {% endblock %}
+
+            {% block scripts %}
+
+            <script>
+
+            document.addEventListener("DOMContentLoaded", function(){
+
+                // -----------------------------
+                // Live Search
+                // -----------------------------
+
+                const searchBox = document.getElementById("jobSearch");
+
+                if(searchBox){
+
+                    searchBox.addEventListener("keyup", function(){
+
+                        const value = this.value.toLowerCase();
+
+                        const cards = document.querySelectorAll(".job-card");
+
+                        cards.forEach(card=>{
+
+                            const text = card.innerText.toLowerCase();
+
+                            if(text.includes(value))
+                                card.style.display = "";
+                            else
+                                card.style.display = "none";
+
+                        });
+
+                    });
+
+                }
+
+                // -----------------------------
+                // Rotate Collapse Icon
+                // -----------------------------
+
+                document.querySelectorAll('[data-bs-toggle="collapse"]').forEach(btn=>{
+
+                    btn.addEventListener("click",function(){
+
+                        const icon=this.querySelector("i");
+
+                        if(icon){
+
+                            icon.classList.toggle("rotate-icon");
+
+                        }
+
+                    });
+
+                });
+
+                // -----------------------------
+                // Delete Confirmation
+                // -----------------------------
+
+                document.querySelectorAll("form").forEach(form=>{
+
+                    if(form.action.includes("delete")){
+
+                        form.addEventListener("submit",function(e){
+
+                            if(!confirm("Delete this item?")){
+
+                                e.preventDefault();
+
+                            }
+
+                        });
+
+                    }
+
+                });
+
+            });
+
+            </script>
+
+            {% endblock %}

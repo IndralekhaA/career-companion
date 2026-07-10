@@ -1,5 +1,6 @@
 from extensions import db
 
+
 class User(db.Model):
 
     id = db.Column(
@@ -29,3 +30,4 @@ class User(db.Model):
         backref = "user",
         lazy ='dynamic'
     )
+

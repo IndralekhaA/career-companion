@@ -1,22 +1,369 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
-</head>
-<body>
-    
-    <h1>Job Tracker Dashboard</h1>
+{% extends "base.html" %}
 
-    <h3>Total Jobs : {{ total_jobs }}</h3>
+{% block title %}Dashboard{% endblock %}
 
-    <ul>
-        <li>Applied: {{ applied }}</li>
-        <li>Interview: {{ interview }}</li>
-        <li>Offer: {{ offer }}</li>
-        <li>rejected: {{ rejected }}</li>
-    </ul>
+{% block content %}
 
-</body>
-</html>
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+
+    <div>
+        <h2 class="fw-bold mb-1">
+            Welcome,
+            {{ current_user.username if current_user else "User" }} 👋
+        </h2>
+
+        <p class="text-muted mb-0">
+            Here's a quick overview of your job search.
+        </p>
+    </div>
+
+    <div class="mt-3 mt-md-0">
+
+        <a href="{{ url_for('add_job') }}"
+           class="btn btn-primary">
+
+            <i class="bi bi-plus-circle"></i>
+            Add Job
+
+        </a>
+
+    </div>
+
+</div>
+
+<!-- ===================== STATS ====================== -->
+
+<div class="row g-4 mb-4">
+
+    <div class="col-lg col-md-4 col-sm-6">
+
+        <div class="card stat-card">
+
+            <div class="card-body">
+
+                <div class="stat-icon bg-primary">
+                    <i class="bi bi-briefcase-fill"></i>
+                </div>
+
+                <h6 class="text-muted mt-3">
+                    Total Jobs
+                </h6>
+
+                <h2 class="fw-bold">
+                    {{ total_jobs }}
+                </h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-lg col-md-4 col-sm-6">
+
+        <div class="card stat-card">
+
+            <div class="card-body">
+
+                <div class="stat-icon bg-info">
+
+                    <i class="bi bi-send-fill"></i>
+
+                </div>
+
+                <h6 class="text-muted mt-3">
+                    Applied
+                </h6>
+
+                <h2 class="fw-bold">
+
+                    {{ Applied }}
+
+                </h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-lg col-md-4 col-sm-6">
+
+        <div class="card stat-card">
+
+            <div class="card-body">
+
+                <div class="stat-icon bg-warning">
+
+                    <i class="bi bi-calendar-check-fill"></i>
+
+                </div>
+
+                <h6 class="text-muted mt-3">
+                    Interviews
+                </h6>
+
+                <h2 class="fw-bold">
+
+                    {{ active_interviews }}
+
+                </h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-lg col-md-6 col-sm-6">
+
+        <div class="card stat-card">
+
+            <div class="card-body">
+
+                <div class="stat-icon bg-success">
+
+                    <i class="bi bi-trophy-fill"></i>
+
+                </div>
+
+                <h6 class="text-muted mt-3">
+                    Offers
+                </h6>
+
+                <h2 class="fw-bold">
+
+                    {{ total_offers }}
+
+                </h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-lg col-md-6 col-sm-6">
+
+        <div class="card stat-card">
+
+            <div class="card-body">
+
+                <div class="stat-icon bg-danger">
+
+                    <i class="bi bi-x-circle-fill"></i>
+
+                </div>
+
+                <h6 class="text-muted mt-3">
+                    Rejected
+                </h6>
+
+                <h2 class="fw-bold">
+
+                    {{ total_rejected }}
+
+                </h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ====================== CONTENT ======================= -->
+
+<div class="row g-4">
+
+    <!-- Recent Jobs -->
+
+    <div class="col-lg-7">
+
+        <div class="card shadow-sm border-0">
+
+            <div class="card-header bg-white">
+
+                <h5 class="mb-0">
+
+                    <i class="bi bi-briefcase"></i>
+
+                    Recent Applications
+
+                </h5>
+
+            </div>
+
+            <div class="card-body">
+
+                {% if recent_jobs %}
+
+                <div class="table-responsive">
+
+                    <table class="table align-middle">
+
+                        <thead>
+
+                        <tr>
+
+                            <th>Company</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Date</th>
+
+                        </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                        {% for job in recent_jobs %}
+
+                        <tr>
+
+                            <td>{{ job.company }}</td>
+
+                            <td>{{ job.role }}</td>
+
+                            <td>
+
+                                <span class="badge rounded-pill bg-secondary">
+
+                                    {{ job.status }}
+
+                                </span>
+
+                            </td>
+
+                            <td>
+
+                                {{ job.date_applied.strftime("%b %d, %Y") }}
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+                {% else %}
+
+                <div class="text-center py-5">
+
+                    <i class="bi bi-folder2-open fs-1 text-muted"></i>
+
+                    <p class="text-muted mt-3">
+
+                        No job applications yet.
+
+                    </p>
+
+                </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Upcoming Interviews -->
+
+    <div class="col-lg-5">
+
+        <div class="card shadow-sm border-0">
+
+            <div class="card-header bg-white">
+
+                <h5 class="mb-0">
+
+                    <i class="bi bi-calendar-event"></i>
+
+                    Upcoming Interviews
+
+                </h5>
+
+            </div>
+
+            <div class="card-body">
+
+                {% if upcoming_interviews %}
+
+                {% for interview in upcoming_interviews %}
+
+                <div class="border-start border-4 border-primary ps-3 mb-4">
+
+                    <h6 class="fw-bold mb-1">
+
+                        {{ interview.job.company }}
+
+                    </h6>
+
+                    <div class="small text-muted">
+
+                        {{ interview.job.role }}
+
+                    </div>
+
+                    <div class="mt-2">
+
+                        <i class="bi bi-calendar3"></i>
+
+                        {{ interview.interview_date.strftime("%b %d, %Y") }}
+
+                    </div>
+
+                    <div>
+
+                        <i class="bi bi-clock"></i>
+
+                        {{ interview.interview_time.strftime("%I:%M %p") }}
+
+                    </div>
+
+                    <div>
+
+                        <span class="badge bg-info">
+
+                            {{ interview.interview_type }}
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+                {% endfor %}
+
+                {% else %}
+
+                <div class="text-center py-5">
+
+                    <i class="bi bi-calendar-x fs-1 text-muted"></i>
+
+                    <p class="text-muted mt-3">
+
+                        No upcoming interviews.
+
+                    </p>
+
+                </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
